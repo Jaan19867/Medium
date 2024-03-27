@@ -14,26 +14,35 @@ const app = new Hono<{
 app.get("/", (c) => {
   return c.text("Hello Hono!")
 })
+app.post("/hello",async (c)=>{
+  console.log("start")
+  const body= await c.req.json();
+  return c.text("this is body " + body)
+})
 
 app.post("/api/v1/signup", async (c) => {
 
+console.log("Hi this is start")
   const prisma = new PrismaClient({
-    datasourceUrl: c.env.DATABASE_URL,
+    datasourceUrl: c.env?.DATABASE_URL,
   }).$extends(withAccelerate())
+  console.log("Hi this is end ")
 const body = await c.req.json();
+console.log(body)
 try{
-  
-  const user=await prisma.user.create({
-    data:{
-      email:body.email,
-      password:body.password,
+  console.log("this is inside the try ")
+  const user = await prisma.user.create({
+    data: {
+    email:body.email,
+      password: body.password,
+      
     },
   })
-
-
-  return c.text("jwt here ")
+  console.log(user)
+  return c.json(user)
 }catch(e){
-  return c.status(403)
+ c.status(403)
+ return c.body("An error occured " + e)
 }
 })
 
